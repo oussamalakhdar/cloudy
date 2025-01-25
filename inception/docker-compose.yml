@@ -1,0 +1,70 @@
+name: inception
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    image: nginx-alpine-slim
+    container_name: nginx
+    hostname: nginx
+    pull_policy: never
+    restart: always
+    init: true
+    depends_on:
+      - wordpress
+    ports:
+      - 80:80
+    networks:
+      - inception
+    volumes:
+      - wordpress:/var/www/html
+
+  database:
+    image: mariadb:lts
+    container_name: database
+    hostname: database
+    pull_policy: missing
+    restart: always
+    init: true
+    networks:
+      - inception
+    volumes:
+      - database:/srv/mysql_data_dir
+    environment:
+      MYSQL_DATA_DIR: /srv/mysql_data_dir
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    env_file: .env
+
+  wordpress:
+    image: wordpress:fpm-alpine
+    container_name: wordpress
+    hostname: wordpress
+    pull_policy: missing
+    restart: always
+    init: true
+    depends_on:
+      - database
+    networks:
+      - inception
+    volumes:
+      - wordpress:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    env_file: .env
+
+volumes:
+  wordpress:
+    name: wordpress
+  database:
+    name: database
+
+networks:
+  inception:
+    driver: bridge
