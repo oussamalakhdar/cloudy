@@ -108,12 +108,11 @@
     docker_compose_dir: "~/Desktop/cloudy/inception/"
     
   tasks:
-    - name: Install Python 3 using raw command
-      ansible.builtin.raw: |
-        sudo amazon-linux-extras enable python3.8
-        sudo yum install -y python3
-      register: python_install_result
-      failed_when: python_install_result.rc != 0
+    - name: Enable and Install Python 3.8
+  ansible.builtin.raw: |
+    amazon-linux-extras enable python3.8
+    yum install -y python3.8
+
 
     - name: Install Docker and Docker Compose using raw command
       ansible.builtin.raw: |
