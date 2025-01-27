@@ -109,9 +109,9 @@
     
   tasks:
     - name: Enable and Install Python 3.8
-  ansible.builtin.raw: |
-    amazon-linux-extras enable python3.8
-    yum install -y python3.8
+      ansible.builtin.raw: |
+       	amazon-linux-extras enable python3.8
+        yum install -y python3.8
 
 
     - name: Install Docker and Docker Compose using raw command
